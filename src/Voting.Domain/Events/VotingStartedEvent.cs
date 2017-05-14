@@ -1,15 +1,13 @@
-using System.Collections.Generic;
-
 namespace Voting.Domain.Events
 {
     public class VotingStartedEvent : IDomainEvent
     {
-        public List<string> Topics { get; }
-        public List<(string topic, int votes)> VotingPair { get; } 
+        public string[] RemainingTopics { get; }
+        public VotingPair VotingPair { get; } 
 
-        public VotingStartedEvent(List<string> topics, List<(string topic, int votes)> votingPair)
+        public VotingStartedEvent(string[] remainingTopics, VotingPair votingPair)
         {
-            Topics = topics;
+            RemainingTopics = remainingTopics;
             VotingPair = votingPair;
         }
     }

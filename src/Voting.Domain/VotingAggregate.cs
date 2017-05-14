@@ -9,55 +9,40 @@ namespace Voting.Domain
     {
         public List<IDomainEvent> Events = new List<IDomainEvent>();
         
-        private List<string> _topics;
-        private List<(string topic, int votes)> _votingPair;
+        private string[] _topics;
+
+        private VotingPair _votingPair;
+
         private string _winner;
 
-        public void CreateVoting (string[] topics)
+        public void CreateVoting (params string[] topics)
         {
             topics = topics ?? throw new ArgumentNullException(nameof(topics)); 
-            Apply(new VotingCreatedEvent(topics.ToList()));
+            Apply(new VotingCreatedEvent(topics));
         }
 
         public void StartNextVoting()
         {
             if (!string.IsNullOrEmpty(_winner))
-                throw new Exception($"The voting is over, the winner was {_winner}");
+                throw new InvalidOperationException($"The voting is over, the winner was {_winner}");
 
-            _topics = _topics.Concat(GetWinners()).ToList();
+            _topics = _topics.Concat(_votingPair.GetWinners()).ToArray();
 
-            if (_topics.Count == 1)
-            {
+            if (_topics.Count() == 1)
                 Apply(new VotingFinishedEvent(winner:_topics.Single()));
-            }
             else
-            {
                 Apply(new VotingStartedEvent(
-                    _topics.Skip(2).ToList(), 
-                    _topics.Take(2).Select(t => (t, 0)).ToList()));
-            }
-
-            IEnumerable<string> GetWinners()
-            {
-                if (!_votingPair.Any()) return new List<string>();
-                
-                var maxVotes = _votingPair.Max(t => t.votes);
-                return _votingPair.Where(x => x.votes == maxVotes).Select(x => x.topic);        
-            }
+                       _topics.Skip(2).ToArray(), 
+                        VotingPair.Create(_topics.Take(2).ToArray())));
         }
 
-        public void VoteTopic (string topic)
-        {
-            if (!_votingPair.Any(x => x.topic == topic))
-                throw new Exception($"Selected topic {topic} is not a valid option for voting");
-            
+        public void VoteTopic (string topic) =>
             Apply(new TopicVotedEvent(topic));
-        }
 
         public void Apply(VotingCreatedEvent @event)
         {
             _topics = @event.Topics;
-            _votingPair = new List<(string, int)>();
+            _votingPair = VotingPair.Empty();
             _winner = string.Empty;
             Events.Add(@event);
         }
@@ -65,16 +50,13 @@ namespace Voting.Domain
         public void Apply(VotingStartedEvent @event)
         {
             _votingPair = @event.VotingPair;
-            _topics = @event.Topics;
+            _topics = @event.RemainingTopics;
             Events.Add(@event);
         }
 
         public void Apply(TopicVotedEvent @event)
         {
-            _votingPair = new List<(string, int)> {
-                _votingPair.Where(x => x.topic == @event.Topic)
-                    .Select(x => (x.topic, ++x.votes)).First(), 
-                _votingPair.Last()};
+            _votingPair = _votingPair.VoteForTopic(@event.Topic);
             Events.Add(@event);
         }
 

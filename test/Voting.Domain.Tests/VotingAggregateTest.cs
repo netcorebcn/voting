@@ -22,7 +22,7 @@ namespace Voting.Domain.Tests
         }
 
         [Fact]
-        public void Given_Topics_When_CreateVoting_Then_VotingCreatedEvent()
+        public void Given_Topics_When_CreateVoting_Then_VotingCreated()
         {
             // Arrange
             var sut = new VotingAggregate();
@@ -38,33 +38,31 @@ namespace Voting.Domain.Tests
         }
 
         [Fact]
-        public void Given_Topics_When_StartNextVoting_Then_VotingStartedEvent()
+        public void Given_CreatedVoting_When_StartNextVoting_Then_VotingStarted()
         {
             // Arrange
             var sut = new VotingAggregate();
-            var topics = new [] {"C#", "F#", "VB.NET", "PowerShell"};
+            sut.CreateVoting("C#", "F#", "VB.NET", "PowerShell");
 
             // Act
-            sut.CreateVoting(topics);
             sut.StartNextVoting();
 
             // Assert
             var result = sut.Events.OfType<VotingStartedEvent>().First();
             Assert.NotNull(result);
-            Assert.Equal(result.VotingPair, new[] {("C#",0),("F#",0)});
-            Assert.Equal(result.Topics, new[] {"VB.NET", "PowerShell"});
+            Assert.Equal(result.VotingPair, VotingPair.Create("C#","F#"));
+            Assert.Equal(result.RemainingTopics, new[] {"VB.NET", "PowerShell"});
         }
 
         [Fact]
-        public void Given_Topics_When_VoteTopic_Then_VotingFinishedEvent()
+        public void Given_StartedVoting_CreatedWithTwoTopics_When_VoteTopic_Then_VotingFinished()
         {
             // Arrange
             var sut = new VotingAggregate();
-            var topics = new [] {"C#", "F#"};
+            sut.CreateVoting("C#", "F#");
+            sut.StartNextVoting();
 
             // Act
-            sut.CreateVoting(topics);
-            sut.StartNextVoting();
             sut.VoteTopic("C#");
             sut.StartNextVoting();
 
@@ -75,14 +73,14 @@ namespace Voting.Domain.Tests
         }
 
         [Fact]
-        public void Given_2Topics_When_Vote2Topics_Then_VotingStartedEvent()
+        public void Given_StartedVoting_When_VoteManyTimes_Then_VotingStarted()
         {
             // Arrange
             var sut = new VotingAggregate();
+            sut.CreateVoting("C#", "F#");
+            sut.StartNextVoting();
 
             // Act
-            sut.CreateVoting(new [] {"C#", "F#"});
-            sut.StartNextVoting();
             sut.VoteTopic("C#");
             sut.VoteTopic("F#");
             sut.StartNextVoting();
@@ -90,7 +88,7 @@ namespace Voting.Domain.Tests
             // Assert
             var result = sut.Events.OfType<VotingStartedEvent>().First();
             Assert.NotNull(result);
-            Assert.Equal(result.VotingPair, new[] {("C#",0),("F#",0)});
+            Assert.Equal(result.VotingPair, VotingPair.Create("C#","F#"));
         }
 
         [Fact]
@@ -98,9 +96,8 @@ namespace Voting.Domain.Tests
         {
             // Arrange
             var sut = new VotingAggregate();
-            var topics = new [] {"C#", "F#"};
 
-            sut.CreateVoting(topics);
+            sut.CreateVoting("C#", "F#");
             sut.StartNextVoting();
             sut.VoteTopic("C#");
             sut.StartNextVoting();
@@ -109,7 +106,38 @@ namespace Voting.Domain.Tests
             Action result = () => sut.StartNextVoting();
 
             // Assert
-            Assert.ThrowsAny<Exception>(result);
+            Assert.ThrowsAny<InvalidOperationException>(result);
+        }
+
+        [Fact]
+        public void Given_CreatedVoting_WithOneTopic_When_StartVoting_Then_VotingFinished()
+        {
+            // Arrange
+            var sut = new VotingAggregate();
+            sut.CreateVoting("C#");
+
+            // Act
+            sut.StartNextVoting();
+
+            // Assert
+            var result = sut.Events.OfType<VotingFinishedEvent>().First();
+            Assert.NotNull(result);
+            Assert.Equal(result.Winner, "C#");
+        }
+
+        [Fact]
+        public void Given_StartedVoting_When_VoteForNonExistingTopic_Then_Exception()
+        {
+            // Arrange
+            var sut = new VotingAggregate();
+            sut.CreateVoting("C#", "F#");
+            sut.StartNextVoting();
+
+            // Act
+            Action result = () => sut.VoteTopic("Haskell");
+
+            // Assert
+            Assert.ThrowsAny<InvalidOperationException>(result);
         }
     }
 }
