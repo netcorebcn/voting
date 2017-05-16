@@ -7,17 +7,11 @@ namespace Voting.Domain.Tests
     public class VotingPairTest
     {
         [Fact]
-        public void Given_NewVotingPair_When_VoteForTopic_Then_NewVotingPair()
-        {
-            var result = VotingPair.Create("C#", "F#").VoteForTopic("C#");
-            Assert.Equal(result, new VotingPair(("C#", 1), ("F#", 0)));
-        }
-
-        [Fact]
         public void Given_CreatedVotingPair_When_VoteForTopic_Then_NewVotingPair()
         {
             var result = VotingPair.Create("C#", "F#").VoteForTopic("C#");
-            Assert.Equal(result, new VotingPair(("C#", 1), ("F#", 0)));
+            Assert.Equal(result.TopicA, ("C#", 1));
+            Assert.Equal(result.TopicB, ("F#", 0));
         }
 
         [Fact]

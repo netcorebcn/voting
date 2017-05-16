@@ -1,12 +1,16 @@
+using System;
+
 namespace Voting.Domain.Events
 {
-    public class VotingCreatedEvent : IDomainEvent
+    public class VotingCreatedEvent
     {
         public string[] Topics { get; }
+        public Guid VotingId { get; internal set; }
 
-        public VotingCreatedEvent(string[] topics)
+        public VotingCreatedEvent(Guid votingId, string[] topics)
         {
-            this.Topics = topics;
+            VotingId = votingId;
+            Topics = topics;
         }
     }
 }

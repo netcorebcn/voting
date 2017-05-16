@@ -4,12 +4,12 @@ using System.Linq;
 
 namespace Voting.Domain
 {
-    public struct VotingPair
+    public class VotingPair
     {
         public (string topic, int votes) TopicA { get; }
         public (string topic, int votes) TopicB { get; }
 
-        public VotingPair((string topic, int votes) topicA, (string topic, int votes) topicB)
+        public VotingPair((string, int) topicA, (string, int) topicB)
         {
             TopicA = topicA;
             TopicB = topicB;
@@ -35,7 +35,7 @@ namespace Voting.Domain
 
             var map = new List<(string topic, int votes)> { TopicA, TopicB };
             var maxVotes = map.Max(t => t.votes);
-            return map.Where(x => x.votes == maxVotes).Select(x => x.topic);
+            return map.Where(x => x.votes == maxVotes).Select(x => x.topic);        
         }
 
         public VotingPair VoteForTopic(string topic) =>
@@ -43,8 +43,8 @@ namespace Voting.Domain
             ? throw new InvalidOperationException($"Selected topic {topic} is not a valid option for voting")              
             : TopicA.topic == topic
                 ? new VotingPair((TopicA.topic, TopicA.votes + 1), TopicB)
-                : new VotingPair(TopicA, (TopicB.topic, TopicB.votes + 1));
-            
+                : new VotingPair(TopicA, (TopicB.topic, TopicB.votes + 1));    
+
         private bool IsValid(string topic) =>
             !string.IsNullOrEmpty(topic) && 
             (TopicA.topic == topic || TopicB.topic == topic);

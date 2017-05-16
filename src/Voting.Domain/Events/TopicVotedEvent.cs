@@ -1,6 +1,6 @@
 namespace Voting.Domain.Events
 {
-    public class TopicVotedEvent : IDomainEvent
+    public class TopicVotedEvent
     {
         public string Topic { get; }
 

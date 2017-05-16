@@ -32,7 +32,7 @@ namespace Voting.Domain.Tests
             sut.CreateVoting(topics);
             
             // Assert
-            var result = sut.Events.OfType<VotingCreatedEvent>().First();
+            var result = sut.GetPendingEvents().OfType<VotingCreatedEvent>().First();
             Assert.NotNull(result);
             Assert.Equal(result.Topics, topics);
         }
@@ -48,9 +48,10 @@ namespace Voting.Domain.Tests
             sut.StartNextVoting();
 
             // Assert
-            var result = sut.Events.OfType<VotingStartedEvent>().First();
+            var result = sut.GetPendingEvents().OfType<VotingStartedEvent>().First();
             Assert.NotNull(result);
-            Assert.Equal(result.VotingPair, VotingPair.Create("C#","F#"));
+            Assert.Equal(result.VotingPair.TopicA, ("C#", 0));
+            Assert.Equal(result.VotingPair.TopicB, ("F#", 0));
             Assert.Equal(result.RemainingTopics, new[] {"VB.NET", "PowerShell"});
         }
 
@@ -67,7 +68,7 @@ namespace Voting.Domain.Tests
             sut.StartNextVoting();
 
             // Assert
-            var result = sut.Events.OfType<VotingFinishedEvent>().First();
+            var result = sut.GetPendingEvents().OfType<VotingFinishedEvent>().First();
             Assert.NotNull(result);
             Assert.Equal(result.Winner, "C#");
         }
@@ -86,9 +87,10 @@ namespace Voting.Domain.Tests
             sut.StartNextVoting();
             
             // Assert
-            var result = sut.Events.OfType<VotingStartedEvent>().First();
+            var result = sut.GetPendingEvents().OfType<VotingStartedEvent>().First();
             Assert.NotNull(result);
-            Assert.Equal(result.VotingPair, VotingPair.Create("C#","F#"));
+            Assert.Equal(result.VotingPair.TopicA, ("C#", 0));
+            Assert.Equal(result.VotingPair.TopicB, ("F#", 0));
         }
 
         [Fact]
@@ -120,7 +122,7 @@ namespace Voting.Domain.Tests
             sut.StartNextVoting();
 
             // Assert
-            var result = sut.Events.OfType<VotingFinishedEvent>().First();
+            var result = sut.GetPendingEvents().OfType<VotingFinishedEvent>().First();
             Assert.NotNull(result);
             Assert.Equal(result.Winner, "C#");
         }
