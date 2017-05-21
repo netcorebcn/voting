@@ -11,6 +11,12 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="1.0.0" />
 
     <PackageReference Include="EasyEventSourcing" Version="0.0.7" />
+
+    <Content Include="Dockerfile.debug">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <BuildAction>Content</BuildAction>
+      <CopyToOutput>true</CopyToOutput>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

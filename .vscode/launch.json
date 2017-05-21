@@ -1,38 +1,24 @@
 {
     "version": "0.2.0",
     "configurations": [
-        {
-            "name": "Voting.Api",
+         {
+            "name": "Voting.Api (Docker)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceRoot}/src/Voting.Api/bin/Debug/netcoreapp1.1/Voting.Api.dll",
-            "args": [],
-            "cwd": "${workspaceRoot}",
-            "stopAtEntry": false,
-            "launchBrowser": {
-                "enabled": true,
-                "args": "${auto-detect-url}/swagger",
-                "windows": {
-                    "command": "cmd.exe",
-                    "args": "/C start ${auto-detect-url}"
-                },
-                "osx": {
-                    "command": "open"
-                },
-                "linux": {
-                    "command": "xdg-open"
-                }
+            "cwd": "/app",
+            "program": "/app/Voting.Api.dll",
+            "sourceFileMap": {
+                "/app": "${workspaceRoot}/src/Voting.Api"
             },
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
+            "pipeTransport": {
+                "debuggerPath": "/vsdbg/vsdbg",
+                "pipeProgram": "/bin/bash",
+                "pipeCwd": "${workspaceRoot}",
+                "pipeArgs": [
+                    "-c",
+                    "docker exec -i voting_api_1 /vsdbg/vsdbg --interpreter=vscode"
+                ]
             }
-        },
-        {
-            "name": ".NET Core Attach",
-            "type": "coreclr",
-            "request": "attach",
-            "processId": "${command:pickProcess}"
         }
     ]
 }

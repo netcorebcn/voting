@@ -22,7 +22,7 @@ namespace Voting.Api
             Configuration = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
                 .Build();
-        
+
             loggerFactory.AddConsole();
         }
 
@@ -31,12 +31,15 @@ namespace Voting.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvcCore().AddApiExplorer().AddJsonFormatters();
-            services.AddSwaggerGen(c => 
+            services.AddSwaggerGen(c =>
                 c.SwaggerDoc("v1", new Info { Title = "Voting API", Version = "v1" })
             );
 
             services.AddEasyEventSourcing(
-                EventStoreOptions.Create(), 
+                EventStoreOptions.Create(
+                    Configuration["EVENT_STORE"],
+                    Configuration["EVENT_STORE_MANAGER_HOST"],
+                    Configuration["STREAM_NAME"]),
                 ReflectionHelper.DomainAssembly);
         }
 

@@ -1,3 +1,3 @@
-docker rm -f eventstore-node
-docker run -d --name eventstore-node -it -p 2113:2113 -p 1113:1113 eventstore/eventstore
-dotnet run -p ./src/Voting.Api/Voting.Api.csproj
+dotnet restore
+dotnet publish -c Debug -o bin/PublishOutput
+docker-compose up --force-recreate --build -d
