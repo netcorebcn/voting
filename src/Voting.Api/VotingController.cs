@@ -18,6 +18,14 @@ namespace Voting.Api.Controllers
             _repository = repository;
         }
 
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<VotingSnapshot> GetVoting(Guid id) 
+        {
+            var voting = await _repository.GetById<VotingAggregate>(id);
+            return voting.CreateSnapshot();
+        }
+
         [HttpPut]
         public async Task<Guid> Create([FromBody] string[] topics)
         {

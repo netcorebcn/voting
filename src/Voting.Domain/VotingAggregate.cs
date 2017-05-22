@@ -63,5 +63,7 @@ namespace Voting.Domain
 
         public void Apply(VotingFinishedEvent @event) =>
             _winner = @event.Winner;
+
+        public VotingSnapshot CreateSnapshot() => new VotingSnapshot(_votingPair, _winner);
     }
 }
