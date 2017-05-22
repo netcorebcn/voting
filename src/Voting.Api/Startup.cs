@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using EasyEventSourcing;
+using EasyWebSockets;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -41,13 +42,30 @@ namespace Voting.Api
                     Configuration["EVENT_STORE_MANAGER_HOST"],
                     Configuration["STREAM_NAME"]),
                 ReflectionHelper.DomainAssembly);
+
+            services.AddWebSocketManager();
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app,
+            IEventStoreBus eventBus,
+            IEventStoreProjections projections,
+            WebSocketHandler wsHandler,
+            ILogger<Startup> logger)
         {
             app.UseMvc();
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Voting API"));
+
+            projections.CreateAsync(Projections.Voting)
+                .DefaultRetryAsync()
+                .Wait();
+
+            eventBus.Subscribe(
+                async (@event) => {
+                    logger.LogInformation(@event.ToString());
+                    await wsHandler.SendMessageToAllAsync(@event);})
+                .DefaultRetryAsync()
+                .Wait();
         }
     }
 }

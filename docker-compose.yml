@@ -11,6 +11,7 @@ services:
     environment:
       - EVENT_STORE=tcp://admin:changeit@eventstore:1113
       - EVENT_STORE_MANAGER_HOST=eventstore:2113 
+      - STREAM_NAME=Voting
       - ASPNETCORE_ENVIRONMENT=Development
     volumes: 
       - ./src/Voting.Api/bin/PublishOutput/:/app
