@@ -2,7 +2,7 @@ using System;
 
 namespace Voting.Domain.Events
 {
-    public class TopicVotedEvent
+    public class TopicVotedEvent : IVotingEvent
     {
         public Guid VotingId { get; }
         public string Topic { get; }
