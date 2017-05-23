@@ -12,19 +12,17 @@ namespace Voting.Api.Controllers
     public class VotingController
     {
         private readonly IRepository _repository;
+        private readonly VotingReadModelService _readModelService;
 
-        public VotingController(IRepository repository)
+        public VotingController(IRepository repository, VotingReadModelService readModelService)
         {
             _repository = repository;
+            _readModelService = readModelService;
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<VotingSnapshot> GetVoting(Guid id) 
-        {
-            var voting = await _repository.GetById<VotingAggregate>(id);
-            return voting.CreateSnapshot();
-        }
+        public async Task<VotingSnapshot> GetVoting(Guid id)  => await _readModelService.Get(id);
 
         [HttpPut]
         public async Task<Guid> Create([FromBody] string[] topics)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -67,6 +68,55 @@ namespace Voting.Domain.Tests
         {
             Action result = () => VotingPair.Create(null, null).VoteForTopic("C#");
             Assert.ThrowsAny<InvalidOperationException>(result);
+        }
+
+        [Fact]
+        public void Given_CreatedVotingPairFromDictionary_When_MoreThanTwoTopics_Then_Empty()
+        {
+            var result = VotingPair.Create(new Dictionary<string, int>()
+            {
+                {"C#", 0},
+                {"F#", 1},
+                {"Haskell", 2}
+            });
+
+            Assert.Equal(result.IsEmpty, true);
+        }
+
+        [Fact]
+        public void Given_CreatedVotingPairFromDictionary_When_OnlyTwoTopics_Then_NewVotingPair()
+        {
+            var result = VotingPair.Create(new Dictionary<string, int>()
+            {
+                {"C#", 1},
+                {"F#", 2}
+            });
+
+            Assert.Equal(result.TopicA, ("C#", 1));
+            Assert.Equal(result.TopicB, ("F#", 2));
+        }
+
+        [Fact]
+        public void Given_CreatedVotingPairFromDictionary_When_NullDictionary_Then_Exception()
+        {
+            Dictionary<string, int> values = null;
+            Action result = () => VotingPair.Create(values);
+
+            Assert.ThrowsAny<ArgumentNullException>(result);
+        }
+
+        [Fact]
+        public void Given_CreatedVotingPair_When_Empty_Then_IsEmpty()
+        {
+            var result = VotingPair.Empty().IsEmpty;
+            Assert.Equal(result, true);
+        }
+
+        [Fact]
+        public void Given_CreatedVotingPair_When_NotEmpty_Then_IsNotEmpty()
+        {
+            var result = VotingPair.Create("not", "empty").IsEmpty;
+            Assert.Equal(result, false);
         }
     }
 }

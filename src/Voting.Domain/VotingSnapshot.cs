@@ -14,9 +14,9 @@ namespace Voting.Domain
 
         public VotingSnapshot (VotingPair votingPair, string winner)
         {
+            votingPair = votingPair ?? VotingPair.Empty();
             Winner = winner;
             Topics = new Dictionary<string, int> ();
-
             if (!votingPair.IsEmpty)
             {
                 Topics.Add(votingPair.TopicA.topic, votingPair.TopicA.votes);
@@ -24,8 +24,7 @@ namespace Voting.Domain
             }
         }
 
-        public override string ToString() =>
-            $@"{string.Join(",",Topics.Select(x => $"{x.Key}:{x.Value}"))}
-            -{nameof(Winner)}{Winner}";
+        public override string ToString() => 
+            $"{string.Join(",",Topics.Select(x => $"{x.Key}:{x.Value}"))}-{nameof(Winner)}{Winner}";
     }
 }

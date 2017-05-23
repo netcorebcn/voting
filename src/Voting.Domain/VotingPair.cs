@@ -20,6 +20,16 @@ namespace Voting.Domain
 
         public bool IsEmpty => string.IsNullOrEmpty(TopicA.topic) || string.IsNullOrEmpty(TopicB.topic);
 
+        public static VotingPair Create(IDictionary<string, int> topics)
+        {
+            topics = topics ?? throw new ArgumentNullException(nameof(topics));
+            if (topics.Count() != 2) return VotingPair.Empty();
+           
+            var topicA = topics.First();
+            var topicB = topics.Last();
+            return new VotingPair((topicA.Key, topicA.Value), (topicB.Key, topicB.Value));
+        }
+
         public static VotingPair Create(params string[] topics)
         {
             topics = topics ?? throw new ArgumentNullException(nameof(topics));

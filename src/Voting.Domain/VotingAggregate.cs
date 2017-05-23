@@ -14,6 +14,16 @@ namespace Voting.Domain
 
         private string _winner;
 
+        public static VotingAggregate CreateFrom(VotingSnapshot votingSnapshot)
+        {
+            var votingAggregate = new VotingAggregate();
+            votingAggregate._winner = votingSnapshot.Winner;
+            votingAggregate._votingPair = VotingPair.Create(votingSnapshot.Topics);
+            return votingAggregate;
+        }
+
+        public VotingSnapshot CreateSnapshot() => new VotingSnapshot(_votingPair, _winner);
+
         public void CreateVoting(params string[] topics)
         {
             topics = topics ?? throw new ArgumentNullException(nameof(topics));
@@ -31,7 +41,6 @@ namespace Voting.Domain
                 RaiseEvent(new VotingFinishedEvent(Id, _topics.Single()));
             else
                 RaiseEvent(new VotingStartedEvent(Id, _topics.Skip(2).ToArray(), VotingPair.Create(_topics.Take(2).ToArray())));
-
         }
 
         public void VoteTopic(string topic)
@@ -55,16 +64,21 @@ namespace Voting.Domain
 
         public void Apply(VotingStartedEvent @event)
         {
+            Id = @event.VotingId;
             _votingPair = @event.VotingPair;
             _topics = @event.RemainingTopics;
         }
 
-        public void Apply(TopicVotedEvent @event) =>
+        public void Apply(TopicVotedEvent @event)
+        {
+            Id = @event.VotingId;
             _votingPair = _votingPair.VoteForTopic(@event.Topic);
+        }
 
-        public void Apply(VotingFinishedEvent @event) =>
+        public void Apply(VotingFinishedEvent @event)
+        {
+            Id = @event.VotingId;
             _winner = @event.Winner;
-
-        public VotingSnapshot CreateSnapshot() => new VotingSnapshot(_votingPair, _winner);
+        }
     }
 }

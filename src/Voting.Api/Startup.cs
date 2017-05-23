@@ -25,6 +25,7 @@ namespace Voting.Api
                 .Build();
 
             loggerFactory.AddConsole();
+            loggerFactory.AddDebug();
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -44,12 +45,14 @@ namespace Voting.Api
                 ReflectionHelper.DomainAssembly);
 
             services.AddWebSocketManager();
+            services.AddSingleton<VotingReadModelService>();
         }
 
         public void Configure(IApplicationBuilder app,
             IEventStoreBus eventBus,
             IEventStoreProjections projections,
             WebSocketHandler wsHandler,
+            VotingReadModelService readModelService,
             ILogger<Startup> logger)
         {
             app.UseMvc();
@@ -60,10 +63,14 @@ namespace Voting.Api
                 .DefaultRetryAsync()
                 .Wait();
 
+
             eventBus.Subscribe(
-                async (@event) => {
-                    logger.LogInformation(@event.ToString());
-                    await wsHandler.SendMessageToAllAsync(@event);})
+                async (@event) =>
+                {                    
+                    var snapshot = await readModelService.AddOrUpdate(@event);
+                    logger.LogInformation(snapshot.ToString());
+                    await wsHandler.SendMessageToAllAsync(snapshot);
+                })
                 .DefaultRetryAsync()
                 .Wait();
         }

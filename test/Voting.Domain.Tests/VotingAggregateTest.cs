@@ -155,5 +155,15 @@ namespace Voting.Domain.Tests
             // Assert
             Assert.ThrowsAny<InvalidOperationException>(result);
         }
+
+        [Fact]
+        public void Given_VotingSnapshot_When_CreateSnaphotFromVotingAggregate_Then_SameSnapshot()
+        {
+            var snapshot = new VotingSnapshot(VotingPair.Empty(), string.Empty);
+            var result = VotingAggregate.CreateFrom(snapshot).CreateSnapshot();
+
+            Assert.Equal(result.Topics, snapshot.Topics);
+            Assert.Equal(result.Winner, snapshot.Winner);
+        }
     }
 }
