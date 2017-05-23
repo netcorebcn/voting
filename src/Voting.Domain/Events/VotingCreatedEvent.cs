@@ -4,8 +4,8 @@ namespace Voting.Domain.Events
 {
     public class VotingCreatedEvent
     {
+        public Guid VotingId { get; }
         public string[] Topics { get; }
-        public Guid VotingId { get; internal set; }
 
         public VotingCreatedEvent(Guid votingId, string[] topics)
         {

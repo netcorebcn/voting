@@ -1,10 +1,16 @@
+using System;
+
 namespace Voting.Domain.Events
 {
     public class VotingFinishedEvent
     {
+        public Guid VotingId { get; }        
         public string Winner {get;}
 
-        public VotingFinishedEvent(string winner) =>
+        public VotingFinishedEvent(Guid votingId, string winner)
+        {
+            this.VotingId = votingId;
             this.Winner = winner;
+        }
     }
 }

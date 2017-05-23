@@ -18,6 +18,8 @@ namespace Voting.Domain
         public static VotingPair Empty() => 
             VotingPair.Create(string.Empty, string.Empty);
 
+        public bool IsEmpty => string.IsNullOrEmpty(TopicA.topic) || string.IsNullOrEmpty(TopicB.topic);
+
         public static VotingPair Create(params string[] topics)
         {
             topics = topics ?? throw new ArgumentNullException(nameof(topics));

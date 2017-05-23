@@ -17,6 +17,8 @@ namespace Voting.Domain
         public void CreateVoting(params string[] topics)
         {
             topics = topics ?? throw new ArgumentNullException(nameof(topics));
+            if (topics.Distinct().Count() != topics.Count()) throw new InvalidOperationException("Duplicated topics are not allowed");
+
             RaiseEvent(new VotingCreatedEvent(Id, topics));
         }
 
@@ -26,22 +28,21 @@ namespace Voting.Domain
             _topics = _topics.Concat(_votingPair.GetWinners()).ToArray();
 
             if (_topics.Count() == 1)
-                RaiseEvent(new VotingFinishedEvent(_topics.Single()));
+                RaiseEvent(new VotingFinishedEvent(Id, _topics.Single()));
             else
-                RaiseEvent(new VotingStartedEvent(_topics.Skip(2).ToArray(), VotingPair.Create(_topics.Take(2).ToArray())));
+                RaiseEvent(new VotingStartedEvent(Id, _topics.Skip(2).ToArray(), VotingPair.Create(_topics.Take(2).ToArray())));
 
         }
 
         public void VoteTopic(string topic)
         {
             AssertNotFinishedVoting();
-            RaiseEvent(new TopicVotedEvent(topic));
+            RaiseEvent(new TopicVotedEvent(Id, topic));
         }
 
         private void AssertNotFinishedVoting()
         {
-            if (!string.IsNullOrEmpty(_winner))
-                throw new InvalidOperationException($"The voting is over, the winner was {_winner}");
+            if (!string.IsNullOrEmpty(_winner)) throw new InvalidOperationException($"The voting is over, the winner was {_winner}");
         }
 
         public void Apply(VotingCreatedEvent @event)

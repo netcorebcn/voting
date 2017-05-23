@@ -13,7 +13,7 @@ namespace Voting.Domain.Tests
         {
             // Arrange
             var sut = new VotingAggregate();
-            
+
             // Act
             Action result = () => sut.CreateVoting(null);
 
@@ -22,15 +22,29 @@ namespace Voting.Domain.Tests
         }
 
         [Fact]
+        public void Given_DuplicatedTopics_When_CreateVoting_Then_Exception()
+        {
+            // Arrange
+            var sut = new VotingAggregate();
+            var topics = new[] { "C#", "F#", "F#", "JS" };
+
+            // Act
+            Action result = () => sut.CreateVoting(topics);
+
+            // Assert
+            Assert.ThrowsAny<InvalidOperationException>(result);
+        }
+
+        [Fact]
         public void Given_Topics_When_CreateVoting_Then_VotingCreated()
         {
             // Arrange
             var sut = new VotingAggregate();
-            var topics = new [] {"C#", "F#", "Java", "JS"};
+            var topics = new[] { "C#", "F#", "Java", "JS" };
 
             // Act
             sut.CreateVoting(topics);
-            
+
             // Assert
             var result = sut.GetPendingEvents().OfType<VotingCreatedEvent>().First();
             Assert.NotNull(result);
@@ -52,7 +66,7 @@ namespace Voting.Domain.Tests
             Assert.NotNull(result);
             Assert.Equal(result.VotingPair.TopicA, ("C#", 0));
             Assert.Equal(result.VotingPair.TopicB, ("F#", 0));
-            Assert.Equal(result.RemainingTopics, new[] {"VB.NET", "PowerShell"});
+            Assert.Equal(result.RemainingTopics, new[] { "VB.NET", "PowerShell" });
         }
 
         [Fact]
@@ -85,7 +99,7 @@ namespace Voting.Domain.Tests
             sut.VoteTopic("C#");
             sut.VoteTopic("F#");
             sut.StartNextVoting();
-            
+
             // Assert
             var result = sut.GetPendingEvents().OfType<VotingStartedEvent>().First();
             Assert.NotNull(result);

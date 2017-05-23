@@ -15,10 +15,17 @@ namespace Voting.Domain
         public VotingSnapshot (VotingPair votingPair, string winner)
         {
             Winner = winner;
-            Topics = new Dictionary<string, int> {
-                { votingPair.TopicA.topic, votingPair.TopicA.votes },
-                { votingPair.TopicB.topic, votingPair.TopicB.votes },
-            };
+            Topics = new Dictionary<string, int> ();
+
+            if (!votingPair.IsEmpty)
+            {
+                Topics.Add(votingPair.TopicA.topic, votingPair.TopicA.votes);
+                Topics.Add(votingPair.TopicB.topic, votingPair.TopicB.votes);
+            }
         }
+
+        public override string ToString() =>
+            $@"{string.Join(",",Topics.Select(x => $"{x.Key}:{x.Value}"))}
+            -{nameof(Winner)}{Winner}";
     }
 }
