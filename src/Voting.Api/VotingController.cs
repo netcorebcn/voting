@@ -35,19 +35,21 @@ namespace Voting.Api.Controllers
 
         [HttpPost]
         [Route("{id}")]
-        public async Task Vote(Guid id, [FromBody]string topic)
+        public async Task<Guid> Vote(Guid id, [FromBody]string topic)
         {
             var voting = await _repository.GetById<VotingAggregate>(id);
             voting.VoteTopic(topic);
             await _repository.Save(voting);
+            return voting.Id;
         }
 
         [HttpDelete("{id}")]
-        public async Task Start(Guid id)
+        public async Task<Guid> Start(Guid id)
         {
             var voting = await _repository.GetById<VotingAggregate>(id);
             voting.StartNextVoting();
             await _repository.Save(voting);
+            return voting.Id;
         }
     }
 }
