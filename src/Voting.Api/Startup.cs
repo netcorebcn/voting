@@ -32,6 +32,14 @@ namespace Voting.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            });
             services.AddMvcCore().AddApiExplorer().AddJsonFormatters();
             services.AddSwaggerGen(c =>
                 c.SwaggerDoc("v1", new Info { Title = "Voting API", Version = "v1" })
@@ -55,18 +63,20 @@ namespace Voting.Api
             VotingReadModelService readModelService,
             ILogger<Startup> logger)
         {
+            app.UseCors("CorsPolicy");
             app.UseMvc();
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Voting API"));
+            app.UseWebSockets();
+            app.MapWebSocketManager("/ws", wsHandler);
 
             projections.CreateAsync(Projections.Voting)
                 .DefaultRetryAsync()
                 .Wait();
 
-
             eventBus.Subscribe(
                 async (@event) =>
-                {                    
+                {
                     var snapshot = await readModelService.AddOrUpdate(@event);
                     logger.LogInformation(snapshot.ToString());
                     await wsHandler.SendMessageToAllAsync(snapshot);
