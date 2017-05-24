@@ -159,7 +159,7 @@ namespace Voting.Domain.Tests
         [Fact]
         public void Given_VotingSnapshot_When_CreateSnaphotFromVotingAggregate_Then_SameSnapshot()
         {
-            var snapshot = new VotingSnapshot(VotingPair.Empty(), string.Empty);
+            var snapshot = new VotingSnapshot(Guid.NewGuid(), VotingPair.Empty(), string.Empty);
             var result = VotingAggregate.CreateFrom(snapshot).CreateSnapshot();
 
             Assert.Equal(result.Topics, snapshot.Topics);

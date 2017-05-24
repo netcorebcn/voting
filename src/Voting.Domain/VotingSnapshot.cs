@@ -8,14 +8,18 @@ namespace Voting.Domain
 {
     public class VotingSnapshot
     {
+        public Guid VotingId { get; }
+
         public IDictionary<string, int> Topics { get; }
 
         public string Winner { get; }
 
-        public VotingSnapshot (VotingPair votingPair, string winner)
+        public VotingSnapshot (Guid votingId, VotingPair votingPair, string winner)
         {
-            votingPair = votingPair ?? VotingPair.Empty();
+            VotingId = votingId;
             Winner = winner;
+
+            votingPair = votingPair ?? VotingPair.Empty();
             Topics = new Dictionary<string, int> ();
             if (!votingPair.IsEmpty)
             {
@@ -25,6 +29,7 @@ namespace Voting.Domain
         }
 
         public override string ToString() => 
-            $"{string.Join(",",Topics.Select(x => $"{x.Key}:{x.Value}"))}-{nameof(Winner)}{Winner}";
+            $@"{nameof(Topics)}:{string.Join(",",Topics.Select(x => $"{x.Key}:{x.Value}"))}
+            {nameof(Winner)}{Winner}";
     }
 }

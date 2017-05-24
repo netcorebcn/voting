@@ -73,7 +73,7 @@ namespace Voting.Domain.Tests
         [Fact]
         public void Given_CreatedVotingPairFromDictionary_When_MoreThanTwoTopics_Then_Empty()
         {
-            var result = VotingPair.Create(new Dictionary<string, int>()
+            var result = VotingPair.CreateFrom(new Dictionary<string, int>()
             {
                 {"C#", 0},
                 {"F#", 1},
@@ -86,7 +86,7 @@ namespace Voting.Domain.Tests
         [Fact]
         public void Given_CreatedVotingPairFromDictionary_When_OnlyTwoTopics_Then_NewVotingPair()
         {
-            var result = VotingPair.Create(new Dictionary<string, int>()
+            var result = VotingPair.CreateFrom(new Dictionary<string, int>()
             {
                 {"C#", 1},
                 {"F#", 2}
@@ -100,7 +100,7 @@ namespace Voting.Domain.Tests
         public void Given_CreatedVotingPairFromDictionary_When_NullDictionary_Then_Exception()
         {
             Dictionary<string, int> values = null;
-            Action result = () => VotingPair.Create(values);
+            Action result = () => VotingPair.CreateFrom(values);
 
             Assert.ThrowsAny<ArgumentNullException>(result);
         }

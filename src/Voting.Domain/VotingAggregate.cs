@@ -18,11 +18,11 @@ namespace Voting.Domain
         {
             var votingAggregate = new VotingAggregate();
             votingAggregate._winner = votingSnapshot.Winner;
-            votingAggregate._votingPair = VotingPair.Create(votingSnapshot.Topics);
+            votingAggregate._votingPair = VotingPair.CreateFrom(votingSnapshot.Topics);
             return votingAggregate;
         }
 
-        public VotingSnapshot CreateSnapshot() => new VotingSnapshot(_votingPair, _winner);
+        public VotingSnapshot CreateSnapshot() => new VotingSnapshot(Id,_votingPair, _winner);
 
         public void CreateVoting(params string[] topics)
         {

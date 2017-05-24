@@ -20,7 +20,7 @@ namespace Voting.Domain
 
         public bool IsEmpty => string.IsNullOrEmpty(TopicA.topic) || string.IsNullOrEmpty(TopicB.topic);
 
-        public static VotingPair Create(IDictionary<string, int> topics)
+        public static VotingPair CreateFrom(IDictionary<string, int> topics)
         {
             topics = topics ?? throw new ArgumentNullException(nameof(topics));
             if (topics.Count() != 2) return VotingPair.Empty();
