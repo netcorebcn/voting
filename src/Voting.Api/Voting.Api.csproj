@@ -13,12 +13,6 @@
     <PackageReference Include="Polly" Version="5.1.0"/>
     <PackageReference Include="EasyEventSourcing" Version="0.0.9" />
     <PackageReference Include="EasyWebSockets" Version="0.0.1" />
-
-    <Content Include="Dockerfile.debug">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <BuildAction>Content</BuildAction>
-      <CopyToOutput>true</CopyToOutput>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>
